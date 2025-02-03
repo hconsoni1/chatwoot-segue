@@ -7,14 +7,21 @@ import { useKeyboardEvents } from 'dashboard/composables/useKeyboardEvents';
 import Spinner from 'shared/components/Spinner.vue';
 import LabelDropdown from 'shared/components/ui/label/LabelDropdown.vue';
 import AddLabel from 'shared/components/ui/dropdown/AddLabel.vue';
+import { useAlert } from 'dashboard/composables';
 
 export default {
+  props: {
+    currentUser: {
+      type: Object,
+      required: true,
+    },
+  },
   components: {
     Spinner,
     LabelDropdown,
     AddLabel,
   },
-  setup() {
+  setup(props) {
     const { isAdmin } = useAdmin();
 
     const {
@@ -28,6 +35,11 @@ export default {
     const showSearchDropdownLabel = ref(false);
 
     const toggleLabels = () => {
+      if ((activeLabels.value.length === 1 && activeLabels.value.some(item => item.title === 'bot')) && props.currentUser.id !== 1) {
+        useAlert('Ação não permitida. Chat marcado apenas como bot.');
+        return; // Retorna nulo e interrompe a execução
+      }
+
       showSearchDropdownLabel.value = !showSearchDropdownLabel.value;
     };
 

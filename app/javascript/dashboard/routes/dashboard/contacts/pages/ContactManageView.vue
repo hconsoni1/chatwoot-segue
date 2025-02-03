@@ -2,6 +2,7 @@
 import { onMounted, computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useStore, useMapGetter } from 'dashboard/composables/store';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import { useRoute, useRouter } from 'vue-router';
 
 import ContactsDetailsLayout from 'dashboard/components-next/Contacts/ContactsDetailsLayout.vue';
@@ -32,6 +33,8 @@ const showSpinner = computed(
   () => isFetchingItem.value || isMergingContact.value
 );
 
+const { isAdmin } = useAdmin();
+
 const { t } = useI18n();
 
 const CONTACT_TABS_OPTIONS = [
@@ -42,11 +45,19 @@ const CONTACT_TABS_OPTIONS = [
 ];
 
 const tabs = computed(() => {
-  return CONTACT_TABS_OPTIONS.map(tab => ({
-    label: t(`CONTACTS_LAYOUT.SIDEBAR.TABS.${tab.key}`),
-    value: tab.value,
-  }));
+  return CONTACT_TABS_OPTIONS
+    .filter(tab => {
+      if (tab.value === 'history' || tab.value === 'merge') {
+        return isAdmin.value;
+      }
+      return true;
+    })
+    .map(tab => ({
+      label: t(`CONTACTS_LAYOUT.SIDEBAR.TABS.${tab.key}`),
+      value: tab.value,
+    }));
 });
+
 
 const activeTabIndex = computed(() => {
   return CONTACT_TABS_OPTIONS.findIndex(v => v.value === activeTab.value);
@@ -139,9 +150,9 @@ onMounted(() => {
             :selected-contact="selectedContact"
           />
           <ContactNotes v-if="activeTab === 'notes'" />
-          <ContactHistory v-if="activeTab === 'history'" />
+          <ContactHistory v-if="activeTab === 'history' && isAdmin" />
           <ContactMerge
-            v-if="activeTab === 'merge'"
+            v-if="activeTab === 'merge' && isAdmin"
             ref="contactMergeRef"
             :selected-contact="selectedContact"
             @go-to-contacts-list="goToContactsList"

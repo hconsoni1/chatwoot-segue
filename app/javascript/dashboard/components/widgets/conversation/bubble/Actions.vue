@@ -125,6 +125,10 @@ export default {
       ) {
         return this.sourceId && this.isSent;
       }
+
+      if (this.isAPIInbox) {
+        return this.isSent;
+      }
       // All messages will be mark as sent for the Line channel, as there is no source ID.
       if (this.isALineChannel) {
         return true;
@@ -140,12 +144,13 @@ export default {
         this.isAWhatsAppChannel ||
         this.isATwilioChannel ||
         this.isASmsInbox ||
-        this.isAFacebookInbox
+        this.isAFacebookInbox ||
+        this.isAPIInbox
       ) {
         return this.sourceId && this.isDelivered;
       }
       // All messages marked as delivered for the web widget inbox and API inbox once they are sent.
-      if (this.isAWebWidgetInbox || this.isAPIInbox) {
+      if (this.isAWebWidgetInbox) {
         return this.isSent;
       }
       if (this.isALineChannel) {

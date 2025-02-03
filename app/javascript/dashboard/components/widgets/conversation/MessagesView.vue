@@ -4,6 +4,7 @@ import { ref } from 'vue';
 import { useConfig } from 'dashboard/composables/useConfig';
 import { useKeyboardEvents } from 'dashboard/composables/useKeyboardEvents';
 import { useAI } from 'dashboard/composables/useAI';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 
 // components
 import ReplyBox from './ReplyBox.vue';
@@ -56,6 +57,7 @@ export default {
   setup() {
     const isPopOutReplyBox = ref(false);
     const { isEnterprise } = useConfig();
+    const { isAdmin } = useAdmin();
 
     const closePopOutReplyBox = () => {
       isPopOutReplyBox.value = false;
@@ -89,6 +91,7 @@ export default {
       isLabelSuggestionFeatureEnabled,
       fetchIntegrationsIfRequired,
       fetchLabelSuggestions,
+      isAdmin,
     };
   },
   data() {
@@ -111,6 +114,13 @@ export default {
     }),
     isOpen() {
       return this.currentChat?.status === wootConstants.STATUS_TYPE.OPEN;
+    },
+    canSeeTheChat() {
+      if (this.isAdmin) {
+        return true;
+      }
+
+      return this.currentChat?.meta.assignee.id === this.currentUser.id;
     },
     shouldShowLabelSuggestions() {
       return (
@@ -474,6 +484,9 @@ export default {
       />
     </div>
     <ul class="conversation-panel">
+      <div v-if="!canSeeTheChat" class="centered-title">
+        <h1>Conversa indisponível</h1>
+      </div>
       <transition name="slide-up">
         <!-- eslint-disable-next-line vue/require-toggle-inside-transition -->
         <li class="min-h-[4rem]">
@@ -481,6 +494,7 @@ export default {
         </li>
       </transition>
       <Message
+        v-if="canSeeTheChat"
         v-for="message in readMessages"
         :key="message.id"
         class="message--read ph-no-capture"
@@ -506,6 +520,7 @@ export default {
         </span>
       </li>
       <Message
+        v-if="canSeeTheChat"
         v-for="message in unReadMessages"
         :key="message.id"
         class="message--unread ph-no-capture"
@@ -565,6 +580,24 @@ export default {
   .rounded-tl-calc {
     border-top-left-radius: calc(1.5rem + 1px);
   }
+}
+
+.centered-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+}
+
+.centered-title h1 {
+  font-size: 24px;
+  color: #333;
 }
 </style>
 

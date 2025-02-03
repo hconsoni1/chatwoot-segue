@@ -30,6 +30,7 @@ import DeleteCustomViews from 'dashboard/routes/dashboard/customviews/DeleteCust
 import ConversationBulkActions from './widgets/conversation/conversationBulkActions/Index.vue';
 import IntersectionObserver from './IntersectionObserver.vue';
 
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import { useUISettings } from 'dashboard/composables/useUISettings';
 import { useAlert } from 'dashboard/composables';
 import { useChatListKeyboardEvents } from 'dashboard/composables/chatlist/useChatListKeyboardEvents';
@@ -77,6 +78,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['conversationLoad']);
+const { isAdmin } = useAdmin();
 const { uiSettings } = useUISettings();
 const { t } = useI18n();
 const router = useRouter();
@@ -191,15 +193,23 @@ const userPermissions = computed(() => {
 });
 
 const assigneeTabItems = computed(() => {
-  return filterItemsByPermission(
-    ASSIGNEE_TYPE_TAB_PERMISSIONS,
-    userPermissions.value,
-    item => item.permissions
-  ).map(({ key, count: countKey }) => ({
-    key,
-    name: t(`CHAT_LIST.ASSIGNEE_TYPE_TABS.${key}`),
-    count: conversationStats.value[countKey] || 0,
-  }));
+  const ASSIGNEE_TYPE_TAB_KEYS = {
+    me: 'mineCount'
+  };
+
+  if (isAdmin.value) {
+    ASSIGNEE_TYPE_TAB_KEYS.unassigned = 'unAssignedCount';
+    ASSIGNEE_TYPE_TAB_KEYS.all = 'allCount';
+  }
+
+  return Object.keys(ASSIGNEE_TYPE_TAB_KEYS).map(key => {
+    const count = conversationStats.value[ASSIGNEE_TYPE_TAB_KEYS[key]] || 0;
+    return {
+      key,
+      name: t(`CHAT_LIST.ASSIGNEE_TYPE_TABS.${key}`),
+      count,
+    };
+  });
 });
 
 const showAssigneeInConversationCard = computed(() => {

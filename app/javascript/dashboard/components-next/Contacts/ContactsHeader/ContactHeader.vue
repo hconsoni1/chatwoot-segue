@@ -132,11 +132,7 @@ const emit = defineEmits([
           />
         </div>
         <div class="w-px h-4 bg-n-strong" />
-        <ComposeConversation>
-          <template #trigger="{ toggle }">
-            <Button :label="buttonLabel" size="sm" @click="toggle" />
-          </template>
-        </ComposeConversation>
+        <Button label="Novo contato" size="sm" @click="emit('add')" />
       </div>
     </div>
   </header>

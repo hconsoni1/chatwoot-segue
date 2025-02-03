@@ -91,6 +91,7 @@ Rails.application.routes.draw do
                 member do
                   post :translate
                   post :retry
+                  post :update_status
                 end
               end
               resources :assignments, only: [:create]
@@ -107,6 +108,7 @@ Rails.application.routes.draw do
               post :toggle_priority
               post :toggle_typing_status
               post :update_last_seen
+              post :update_last_seen_2
               post :unread
               post :custom_attributes
               get :attachments

@@ -159,22 +159,14 @@ export default {
   >
     <section class="max-w-5xl mx-auto">
       <img
-        :src="globalConfig.logo"
+        src="https://negocios.seguefinanceira.com.br/2b2acdb1-5132-454d-9809-da92ff8a18a8.png"
         :alt="globalConfig.installationName"
-        class="block w-auto h-8 mx-auto dark:hidden"
-      />
-      <img
-        v-if="globalConfig.logoDark"
-        :src="globalConfig.logoDark"
-        :alt="globalConfig.installationName"
-        class="hidden w-auto h-8 mx-auto dark:block"
+        class="mx-auto h-40	w-auto block"
       />
       <h2
         class="mt-6 text-3xl font-medium text-center text-slate-900 dark:text-woot-50"
       >
-        {{
-          useInstallationName($t('LOGIN.TITLE'), globalConfig.installationName)
-        }}
+        Segnet
       </h2>
       <p
         v-if="showSignupLink"
@@ -203,8 +195,8 @@ export default {
             data-testid="email_input"
             :tabindex="1"
             required
-            :label="$t('LOGIN.EMAIL.LABEL')"
-            :placeholder="$t('LOGIN.EMAIL.PLACEHOLDER')"
+            label="E-mail"
+            placeholder="Digite seu e-mail"
             :has-error="v$.credentials.email.$error"
             @input="v$.credentials.email.$touch"
           />
@@ -215,8 +207,8 @@ export default {
             data-testid="password_input"
             required
             :tabindex="2"
-            :label="$t('LOGIN.PASSWORD.LABEL')"
-            :placeholder="$t('LOGIN.PASSWORD.PLACEHOLDER')"
+            label="Senha"
+            placeholder="Digite sua senha"
             :has-error="v$.credentials.password.$error"
             @input="v$.credentials.password.$touch"
           >
@@ -226,7 +218,7 @@ export default {
                 class="text-sm text-link"
                 tabindex="4"
               >
-                {{ $t('LOGIN.FORGOT_PASSWORD') }}
+                Esqueceu sua senha?
               </router-link>
             </p>
           </FormInput>

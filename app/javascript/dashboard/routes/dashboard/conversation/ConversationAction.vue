@@ -3,6 +3,7 @@
 import { mapGetters } from 'vuex';
 import { useAlert } from 'dashboard/composables';
 import { useAgentsList } from 'dashboard/composables/useAgentsList';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import ContactDetailsItem from './ContactDetailsItem.vue';
 import MultiselectDropdown from 'shared/components/ui/MultiselectDropdown.vue';
 import ConversationLabels from './labels/LabelBox.vue';
@@ -24,8 +25,10 @@ export default {
   },
   setup() {
     const { agentsList } = useAgentsList();
+    const { isAdmin } = useAdmin();
     return {
       agentsList,
+      isAdmin,
     };
   },
   data() {
@@ -178,6 +181,12 @@ export default {
       this.assignedAgent = selfAssign;
     },
     onClickAssignAgent(selectedItem) {
+      // Prevent non-admin users from assigning tasks to themselves
+      if (!this.isAdmin && selectedItem.id === this.currentUser.id) {
+        useAlert('Ação não permitida. Contate um coordenador')
+        return;
+      }
+
       if (this.assignedAgent && this.assignedAgent.id === selectedItem.id) {
         this.assignedAgent = null;
       } else {
@@ -211,17 +220,6 @@ export default {
         compact
         :title="$t('CONVERSATION_SIDEBAR.ASSIGNEE_LABEL')"
       >
-        <template #button>
-          <woot-button
-            v-if="showSelfAssign"
-            icon="arrow-right"
-            variant="link"
-            size="small"
-            @click="onSelfAssign"
-          >
-            {{ $t('CONVERSATION_SIDEBAR.SELF_ASSIGN') }}
-          </woot-button>
-        </template>
       </ContactDetailsItem>
       <MultiselectDropdown
         :options="agentsList"
@@ -278,6 +276,6 @@ export default {
       compact
       :title="$t('CONVERSATION_SIDEBAR.ACCORDION.CONVERSATION_LABELS')"
     />
-    <ConversationLabels :conversation-id="conversationId" />
+    <ConversationLabels :conversation-id="conversationId" :current-user="currentUser"/>
   </div>
 </template>

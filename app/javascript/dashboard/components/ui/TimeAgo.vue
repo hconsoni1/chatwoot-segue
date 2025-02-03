@@ -115,6 +115,6 @@ export default {
     }"
     class="ml-auto leading-4 text-xxs text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-slate-100"
   >
-    <span>{{ `${createdAtTime} • ${lastActivityTime}` }}</span>
+    <span>{{ `${lastActivityTime}` }}</span>
   </div>
 </template>

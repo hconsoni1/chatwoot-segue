@@ -4,6 +4,7 @@ import { useAlert } from 'dashboard/composables';
 import { emitter } from 'shared/helpers/mitt';
 import EmailTranscriptModal from './EmailTranscriptModal.vue';
 import ResolveAction from '../../buttons/ResolveAction.vue';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 import {
   CMD_MUTE_CONVERSATION,
   CMD_SEND_TRANSCRIPT,
@@ -16,8 +17,10 @@ export default {
     ResolveAction,
   },
   data() {
+    const { isAdmin } = useAdmin();
     return {
       showEmailActionsModal: false,
+      isAdmin,
     };
   },
   computed: {
@@ -45,13 +48,16 @@ export default {
     toggleEmailActionsModal() {
       this.showEmailActionsModal = !this.showEmailActionsModal;
     },
+    exportConversation() {
+      window.open("https://n8n.webmond.com.br/webhook/exporta-conversa-segnet?conversa=" + this.currentChat.id , '_blank');
+    },
   },
 };
 </script>
 
 <template>
   <div class="relative flex items-center gap-2 actions--container">
-    <woot-button
+    <!-- <woot-button
       v-if="!currentChat.muted"
       v-tooltip="$t('CONTACT_PANEL.MUTE_CONTACT')"
       variant="clear"
@@ -66,13 +72,14 @@ export default {
       color-scheme="secondary"
       icon="speaker-1"
       @click="unmute"
-    />
+    /> -->
     <woot-button
+      v-if="isAdmin"
       v-tooltip="$t('CONTACT_PANEL.SEND_TRANSCRIPT')"
       variant="clear"
       color-scheme="secondary"
       icon="share"
-      @click="toggleEmailActionsModal"
+      @click="exportConversation"
     />
     <ResolveAction
       :conversation-id="currentChat.id"

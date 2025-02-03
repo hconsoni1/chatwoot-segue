@@ -8,6 +8,7 @@ import wootConstants from 'dashboard/constants/globals';
 import { frontendURL } from 'dashboard/helper/URLHelper';
 import { ACCOUNT_EVENTS } from '../../../helper/AnalyticsHelper/events';
 import { useTrack } from 'dashboard/composables';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 
 export default {
   components: {
@@ -45,9 +46,11 @@ export default {
   },
   emits: ['toggleAccounts', 'openNotificationPanel', 'openKeyShortcutModal'],
   data() {
+    const { isAdmin } = useAdmin();
     return {
       helpDocsURL: wootConstants.DOCS_URL,
       showOptionsMenu: false,
+      isAdmin,
     };
   },
   methods: {
@@ -92,7 +95,7 @@ export default {
     </div>
     <div class="flex flex-col items-center justify-end pb-6">
       <a
-        v-if="!isACustomBrandedInstance"
+        v-if="!isACustomBrandedInstance && 1 == 2"
         v-tooltip.right="$t(`SIDEBAR.DOCS`)"
         :href="helpDocsURL"
         class="relative flex items-center justify-center w-10 h-10 my-2 rounded-lg text-slate-700 dark:text-slate-100 hover:bg-slate-25 dark:hover:bg-slate-700 dark:hover:text-slate-100 hover:text-slate-600"
@@ -102,7 +105,7 @@ export default {
         <fluent-icon icon="book-open-globe" />
         <span class="sr-only">{{ $t(`SIDEBAR.DOCS`) }}</span>
       </a>
-      <NotificationBell @open-notification-panel="openNotificationPanel" />
+      <NotificationBell v-if="isAdmin" @open-notification-panel="openNotificationPanel" />
       <AgentDetails @toggle-menu="toggleOptions" />
       <OptionsMenu
         :show="showOptionsMenu"

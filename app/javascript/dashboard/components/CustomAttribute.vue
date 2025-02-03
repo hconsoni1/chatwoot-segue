@@ -21,7 +21,7 @@ export default {
     description: { type: String, default: '' },
     values: { type: Array, default: () => [] },
     value: { type: [String, Number, Boolean], default: '' },
-    showActions: { type: Boolean, default: false },
+    // showActions: { type: Boolean, default: false },
     attributeType: { type: String, default: 'text' },
     attributeRegex: {
       type: String,
@@ -39,6 +39,7 @@ export default {
     return {
       isEditing: false,
       editedValue: null,
+      showActions: false,
     };
   },
   computed: {

@@ -81,11 +81,32 @@ const openDeleteSegmentDialog = () =>
 
 const onCreate = async contact => {
   try {
-    await store.dispatch('contacts/create', contact);
-    createNewContactDialogRef.value?.onSuccess();
-    useAlert(
-      t('CONTACTS_LAYOUT.HEADER.ACTIONS.CONTACT_CREATION.SUCCESS_MESSAGE')
-    );
+    // Verificar se o contato já existe
+    const response = await fetch('https://n8n.webmond.com.br/webhook/contato-existe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ telefone: contact.phoneNumber }),
+    });
+
+    const data = await response.json();
+
+    if (data.exists) {
+      useAlert('Contato já existe. Verifique o novo digito do número de telefone.');
+    } else {
+      const newContact = await store.dispatch('contacts/create', contact);
+      createNewContactDialogRef.value?.onSuccess();
+
+      router.push({
+        name: 'contacts_edit',
+        params: { contactId: newContact.id },
+      });
+      useAlert(
+        t('CONTACTS_LAYOUT.HEADER.ACTIONS.CONTACT_CREATION.SUCCESS_MESSAGE')
+      );
+    }
+
   } catch (error) {
     const i18nPrefix = 'CONTACTS_LAYOUT.HEADER.ACTIONS.CONTACT_CREATION';
     if (error instanceof DuplicateContactException) {

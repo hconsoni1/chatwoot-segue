@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useStore } from 'dashboard/composables/store';
 import { useAlert } from 'dashboard/composables';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 
 import ListAttribute from 'dashboard/components-next/CustomAttributes/ListAttribute.vue';
 import CheckboxAttribute from 'dashboard/components-next/CustomAttributes/CheckboxAttribute.vue';
@@ -21,6 +22,7 @@ const props = defineProps({
   },
 });
 
+const { isAdmin } = useAdmin();
 const store = useStore();
 const { t } = useI18n();
 const route = useRoute();
@@ -85,6 +87,7 @@ const CurrentAttributeComponent = computed(() => {
     </div>
 
     <component
+      v-if="isAdmin"
       :is="CurrentAttributeComponent"
       :attribute="attribute"
       :is-editing-view="isEditingView"

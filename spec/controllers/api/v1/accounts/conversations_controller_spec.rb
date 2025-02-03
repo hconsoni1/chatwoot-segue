@@ -690,6 +690,38 @@ RSpec.describe 'Conversations API', type: :request do
     end
   end
 
+  describe 'POST /api/v1/accounts/{account.id}/conversations/:id/update_last_seen_2' do
+    context 'when it is an unauthenticated user' do
+      it 'returns unauthorized' do
+        post "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/update_last_seen_2"
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    context 'when it is an authenticated user' do
+      let(:agent) { create(:user, account: account, role: :agent) }
+
+      before do
+        create(:inbox_member, user: agent, inbox: conversation.inbox)
+      end
+
+      it 'updates contact_last_seen_at and triggers the UpdateMessageStatusJob' do
+        expect(conversation.reload.contact_last_seen_at).to be_nil
+
+        # Simule o Job de Atualização do Status da Mensagem
+        expect(Conversations::UpdateMessageStatusJob).to receive(:perform_later).with(conversation.id, anything)
+
+        post "/api/v1/accounts/#{account.id}/conversations/#{conversation.display_id}/update_last_seen_2",
+             headers: agent.create_new_auth_token,
+             as: :json
+
+        expect(response).to have_http_status(:success)
+        expect(conversation.reload.contact_last_seen_at).not_to be_nil
+      end
+    end
+  end
+
   describe 'POST /api/v1/accounts/{account.id}/conversations/:id/unread' do
     let(:conversation) { create(:conversation, account: account) }
 

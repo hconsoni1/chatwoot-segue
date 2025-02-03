@@ -1,7 +1,8 @@
 <script setup>
-import { computed, useSlots } from 'vue';
+import { computed, useSlots, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
+import { useStore } from 'dashboard/composables/store';
 
 import Button from 'dashboard/components-next/button/Button.vue';
 import Breadcrumb from 'dashboard/components-next/breadcrumb/Breadcrumb.vue';
@@ -24,6 +25,8 @@ const { t } = useI18n();
 const slots = useSlots();
 const route = useRoute();
 
+const store = useStore();
+
 const contactId = computed(() => route.params.contactId);
 
 const selectedContactName = computed(() => {
@@ -45,6 +48,21 @@ const breadcrumbItems = computed(() => {
   return items;
 });
 
+const hasConversations = computed(() => {
+  const conversations = store.getters['contactConversations/getContactConversation'](props.selectedContact.id);
+
+  if (!conversations || !Array.isArray(conversations)) {
+    return false;
+  }
+
+  const filteredConversations = conversations.filter(conversation => conversation.inbox_id === 22);
+  return filteredConversations.length > 0;
+});
+
+onMounted(() => {
+  store.dispatch('contactConversations/get', contactId.value);
+});
+
 const handleBreadcrumbClick = () => {
   emit('goToContactsList');
 };
@@ -64,7 +82,7 @@ const handleBreadcrumbClick = () => {
               :items="breadcrumbItems"
               @click="handleBreadcrumbClick"
             />
-            <ComposeConversation :contact-id="contactId">
+            <ComposeConversation v-if="!hasConversations" :contact-id="contactId">
               <template #trigger="{ toggle }">
                 <Button :label="buttonLabel" size="sm" @click="toggle" />
               </template>

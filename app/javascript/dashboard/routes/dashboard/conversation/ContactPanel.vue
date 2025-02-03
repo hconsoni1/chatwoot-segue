@@ -2,6 +2,7 @@
 import { computed, watch, onMounted, ref } from 'vue';
 import { useMapGetter, useStore } from 'dashboard/composables/store';
 import { useUISettings } from 'dashboard/composables/useUISettings';
+import { useAdmin } from 'dashboard/composables/useAdmin';
 
 import AccordionItem from 'dashboard/components/Accordion/AccordionItem.vue';
 import ContactConversations from './ContactConversations.vue';
@@ -35,6 +36,8 @@ const {
   conversationSidebarItemsOrder,
   toggleSidebarUIState,
 } = useUISettings();
+
+const { isAdmin } = useAdmin();
 
 const dragging = ref(false);
 const conversationSidebarItems = ref([]);
@@ -184,7 +187,7 @@ onMounted(() => {
                 />
               </AccordionItem>
             </div>
-            <div v-else-if="element.name === 'previous_conversation'">
+            <div v-else-if="element.name === 'previous_conversation' && isAdmin">
               <AccordionItem
                 v-if="contact.id"
                 :title="

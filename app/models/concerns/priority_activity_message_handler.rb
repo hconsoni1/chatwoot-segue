@@ -4,6 +4,8 @@ module PriorityActivityMessageHandler
   private
 
   def priority_change_activity(user_name)
+    return if Current.user&.id == 1
+    
     old_priority, new_priority = previous_changes.values_at('priority')[0]
     return unless priority_change?(old_priority, new_priority)
 

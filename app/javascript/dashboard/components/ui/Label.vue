@@ -1,5 +1,6 @@
 <script>
 import { getContrastingTextColor } from '@chatwoot/utils';
+import { mapGetters } from 'vuex';
 
 export default {
   props: {
@@ -23,10 +24,10 @@ export default {
       type: Boolean,
       default: false,
     },
-    showClose: {
-      type: Boolean,
-      default: false,
-    },
+    // showClose: {
+    //   type: Boolean,
+    //   default: false,
+    // },
     icon: {
       type: String,
       default: '',
@@ -46,6 +47,12 @@ export default {
   },
   emits: ['remove'],
   computed: {
+    ...mapGetters({
+      currentUser: 'getCurrentUser',
+    }),
+    showClose() {
+      return this.currentUser.id === 1;
+    },
     textColor() {
       if (this.variant === 'smooth') return '';
       if (this.variant === 'dashed') return '';

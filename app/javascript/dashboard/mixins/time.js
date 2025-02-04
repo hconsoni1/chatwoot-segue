@@ -33,14 +33,14 @@ export default {
       // with the following format: 1m, 1h, 1d, 1mo, 1y
       // The function also takes an optional boolean parameter withAgo
       // which will add the word "ago" to the end of the time string
-      const suffix = withAgo ? ' ago' : '';
+      const suffix = withAgo ? ' atrás' : '';
       const timeMappings = {
-        'less than a minute ago': 'now',
+        'less than a minute ago': 'agora',
         'a minute ago': `1m${suffix}`,
         'an hour ago': `1h${suffix}`,
         'a day ago': `1d${suffix}`,
-        'a month ago': `1mo${suffix}`,
-        'a year ago': `1y${suffix}`,
+        'a month ago': `1 mês${suffix}`,
+        'a year ago': `1 ano${suffix}`,
       };
       // Check if the time string is one of the specific cases
       if (timeMappings[time]) {
@@ -54,10 +54,10 @@ export default {
         .replace(' hours ago', `h${suffix}`)
         .replace(' day ago', `d${suffix}`)
         .replace(' days ago', `d${suffix}`)
-        .replace(' month ago', `mo${suffix}`)
-        .replace(' months ago', `mo${suffix}`)
-        .replace(' year ago', `y${suffix}`)
-        .replace(' years ago', `y${suffix}`);
+        .replace(' month ago', ` mês${suffix}`)
+        .replace(' months ago', ` meses${suffix}`)
+        .replace(' year ago', ` ano${suffix}`)
+        .replace(' years ago', ` anos${suffix}`);
       return convertToShortTime;
     },
   },

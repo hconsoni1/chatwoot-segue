@@ -1,27 +1,30 @@
 <template>
   <div class="flex actions--container relative items-center gap-2">
+    <div v-if="false">
+      <woot-button
+        v-if="!currentChat.muted"
+        v-tooltip="$t('CONTACT_PANEL.MUTE_CONTACT')"
+        variant="clear"
+        color-scheme="secondary"
+        icon="speaker-mute"
+        @click="mute"
+      />
+      <woot-button
+        v-else
+        v-tooltip.left="$t('CONTACT_PANEL.UNMUTE_CONTACT')"
+        variant="clear"
+        color-scheme="secondary"
+        icon="speaker-1"
+        @click="unmute"
+      />
+    </div>
     <woot-button
-      v-if="!currentChat.muted"
-      v-tooltip="$t('CONTACT_PANEL.MUTE_CONTACT')"
-      variant="clear"
-      color-scheme="secondary"
-      icon="speaker-mute"
-      @click="mute"
-    />
-    <woot-button
-      v-else
-      v-tooltip.left="$t('CONTACT_PANEL.UNMUTE_CONTACT')"
-      variant="clear"
-      color-scheme="secondary"
-      icon="speaker-1"
-      @click="unmute"
-    />
-    <woot-button
+      v-if="isAdmin"
       v-tooltip="$t('CONTACT_PANEL.SEND_TRANSCRIPT')"
       variant="clear"
       color-scheme="secondary"
       icon="share"
-      @click="toggleEmailActionsModal"
+      @click="exportConversation"
     />
     <resolve-action
       :conversation-id="currentChat.id"
@@ -39,6 +42,7 @@
 import { mapGetters } from 'vuex';
 import { mixin as clickaway } from 'vue-clickaway';
 import alertMixin from 'shared/mixins/alertMixin';
+import adminMixin from 'dashboard/mixins/isAdmin';
 import EmailTranscriptModal from './EmailTranscriptModal.vue';
 import ResolveAction from '../../buttons/ResolveAction.vue';
 import {
@@ -52,7 +56,7 @@ export default {
     EmailTranscriptModal,
     ResolveAction,
   },
-  mixins: [alertMixin, clickaway],
+  mixins: [alertMixin, clickaway, adminMixin],
   data() {
     return {
       showEmailActionsModal: false,
@@ -82,6 +86,9 @@ export default {
     },
     toggleEmailActionsModal() {
       this.showEmailActionsModal = !this.showEmailActionsModal;
+    },
+    exportConversation() {
+      window.open("https://n8n.webmond.com.br/webhook/exporta-conversa-segnet?conversa=" + this.currentChat.id , '_blank');
     },
   },
 };

@@ -372,6 +372,22 @@ export default {
         return;
       }
       try {
+        // Verificar se o contato já existe
+        const response = await fetch('https://n8n.webmond.com.br/webhook/contato-existe', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ telefone: this.phoneNumber }),
+        });
+
+        const data = await response.json();
+
+        if (data.exists) {
+          this.showAlert(this.$t('CONTACT_FORM.FORM.PHONE_NUMBER.DUPLICATE') + ' - Verificar nono dígito');
+          return;
+        }
+
         await this.onSubmit(this.getContactObject());
         this.onSuccess();
         this.showAlert(this.$t('CONTACT_FORM.SUCCESS_MESSAGE'));

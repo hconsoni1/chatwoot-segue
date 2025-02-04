@@ -17,7 +17,7 @@
       <div class="flex max-w-[85%] justify-center items-center">
         <h1
           class="text-xl break-words overflow-hidden whitespace-nowrap font-medium text-ellipsis text-black-900 dark:text-slate-100 mb-0"
-          :title="pageTitle"
+          title="pageTitle"
         >
           {{ pageTitle }}
         </h1>
@@ -66,7 +66,7 @@
           />
         </div>
         <woot-button
-          v-else
+          v-if="!hasActiveFolders && isAdmin"
           v-tooltip.right="$t('FILTER.TOOLTIP_LABEL')"
           variant="smooth"
           color-scheme="secondary"
@@ -335,6 +335,9 @@ export default {
       campaigns: 'campaigns/getAllCampaigns',
       labels: 'labels/getLabels',
     }),
+    isAdmin() {
+      return this.currentUser.role === 'administrator';
+    },
     hasAppliedFilters() {
       return this.appliedFilters.length !== 0;
     },
@@ -367,10 +370,15 @@ export default {
     },
     assigneeTabItems() {
       const ASSIGNEE_TYPE_TAB_KEYS = {
-        me: 'mineCount',
-        unassigned: 'unAssignedCount',
-        all: 'allCount',
+        me: 'mineCount'
       };
+
+      if (this.currentUser.role === 'administrator') {
+        ASSIGNEE_TYPE_TAB_KEYS.unassigned = 'unAssignedCount';
+        ASSIGNEE_TYPE_TAB_KEYS.all = 'allCount';
+      }
+
+
       return Object.keys(ASSIGNEE_TYPE_TAB_KEYS).map(key => {
         const count = this.conversationStats[ASSIGNEE_TYPE_TAB_KEYS[key]] || 0;
         return {

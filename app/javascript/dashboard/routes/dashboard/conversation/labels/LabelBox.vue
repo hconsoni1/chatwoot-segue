@@ -1,46 +1,22 @@
 <template>
-  <div class="sidebar-labels-wrap">
-    <div
-      v-if="!conversationUiFlags.isFetching"
-      class="contact-conversation--list"
-    >
-      <div
-        v-on-clickaway="closeDropdownLabel"
-        class="label-wrap"
-        @keyup.esc="closeDropdownLabel"
-      >
-        <add-label @add="toggleLabels" />
-        <woot-label
-          v-for="label in activeLabels"
-          :key="label.id"
-          :title="label.title"
-          :description="label.description"
-          :show-close="true"
-          :color="label.color"
-          variant="smooth"
-          class="max-w-[calc(100%-0.5rem)]"
-          @click="removeLabelFromConversation"
-        />
+<div class="sidebar-labels-wrap">
+  <div v-if="!conversationUiFlags.isFetching" class="contact-conversation--list">
+    <div v-on-clickaway="closeDropdownLabel" class="label-wrap" @keyup.esc="closeDropdownLabel">
+      <add-label @add="toggleLabels" />
+      <woot-label v-for="label in activeLabels" :key="label.id" :title="label.title" :description="label.description"
+        :show-close="true" :color="label.color" variant="smooth" class="max-w-[calc(100%-0.5rem)]"
+        @click="removeLabelFromConversation" />
 
-        <div class="dropdown-wrap">
-          <div
-            :class="{ 'dropdown-pane--open': showSearchDropdownLabel }"
-            class="dropdown-pane"
-          >
-            <label-dropdown
-              v-if="showSearchDropdownLabel"
-              :account-labels="accountLabels"
-              :selected-labels="savedLabels"
-              :allow-creation="isAdmin"
-              @add="addLabelToConversation"
-              @remove="removeLabelFromConversation"
-            />
-          </div>
+      <div class="dropdown-wrap">
+        <div :class="{ 'dropdown-pane--open': showSearchDropdownLabel }" class="dropdown-pane">
+          <label-dropdown v-if="showSearchDropdownLabel" :account-labels="accountLabels" :selected-labels="savedLabels"
+            :allow-creation="isAdmin" @add="addLabelToConversation" @remove="removeLabelFromConversation" />
         </div>
       </div>
     </div>
-    <spinner v-else />
   </div>
+  <spinner v-else />
+</div>
 </template>
 
 <script>
@@ -52,6 +28,7 @@ import { mixin as clickaway } from 'vue-clickaway';
 import adminMixin from 'dashboard/mixins/isAdmin';
 import eventListenerMixins from 'shared/mixins/eventListenerMixins';
 import conversationLabelMixin from 'dashboard/mixins/conversation/labelMixin';
+import alertMixin from 'shared/mixins/alertMixin';
 import {
   buildHotKeys,
   isEscape,
@@ -65,10 +42,14 @@ export default {
     AddLabel,
   },
 
-  mixins: [clickaway, conversationLabelMixin, adminMixin, eventListenerMixins],
+  mixins: [clickaway, conversationLabelMixin, adminMixin, eventListenerMixins, alertMixin],
   props: {
     conversationId: {
       type: Number,
+      required: true,
+    },
+    currentUser: {
+      type: Object,
       required: true,
     },
   },
@@ -88,6 +69,12 @@ export default {
   },
   methods: {
     toggleLabels() {
+      // Verifica se o chat possui apenas a label 'bot'
+      if ((this.activeLabels.length === 1 && this.activeLabels.some(item => item.title === 'bot')) && this.currentUser.id !== 1) {
+        this.showAlert('Ação não permitida. Chat marcado apenas como bot.');
+        return; // Retorna nulo e interrompe a execução
+      }
+
       this.showSearchDropdownLabel = !this.showSearchDropdownLabel;
     },
     closeDropdownLabel() {
@@ -112,6 +99,7 @@ export default {
 .sidebar-labels-wrap {
   margin-bottom: 0;
 }
+
 .contact-conversation--list {
   width: 100%;
 

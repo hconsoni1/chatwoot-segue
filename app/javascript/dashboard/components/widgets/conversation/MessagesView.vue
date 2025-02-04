@@ -21,12 +21,16 @@
       />
     </div>
     <ul class="conversation-panel">
+      <div v-if="!canSeeTheChat" class="centered-title">
+        <h1>Conversa indisponível</h1>
+      </div>
       <transition name="slide-up">
         <li class="min-h-[4rem]">
           <span v-if="shouldShowSpinner" class="spinner message" />
         </li>
       </transition>
       <message
+        v-if="canSeeTheChat"
         v-for="message in getReadMessages"
         :key="message.id"
         class="message--read ph-no-capture"
@@ -118,6 +122,7 @@ import inboxMixin, { INBOX_FEATURES } from 'shared/mixins/inboxMixin';
 import configMixin from 'shared/mixins/configMixin';
 import eventListenerMixins from 'shared/mixins/eventListenerMixins';
 import aiMixin from 'dashboard/mixins/aiMixin';
+import adminMixin from 'dashboard/mixins/isAdmin';
 
 // utils
 import { getTypingUsersText } from '../../../helper/commons';
@@ -144,6 +149,7 @@ export default {
     eventListenerMixins,
     configMixin,
     aiMixin,
+    adminMixin,
   ],
   props: {
     isContactPanelOpen: {
@@ -180,9 +186,17 @@ export default {
       appIntegrations: 'integrations/getAppIntegrations',
       isFeatureEnabledonAccount: 'accounts/isFeatureEnabledonAccount',
       currentAccountId: 'getCurrentAccountId',
+      currentUser: 'getCurrentUser',
     }),
     isOpen() {
       return this.currentChat?.status === wootConstants.STATUS_TYPE.OPEN;
+    },
+    canSeeTheChat() {
+      if (this.isAdmin) {
+        return true;
+      }
+
+      return this.currentChat?.meta.assignee.id === this.currentUser.id;
     },
     shouldShowLabelSuggestions() {
       return (
@@ -547,6 +561,24 @@ export default {
   .rounded-tl-calc {
     border-top-left-radius: calc(1.5rem + 1px);
   }
+}
+
+.centered-title {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 10;
+}
+
+.centered-title h1 {
+  font-size: 24px;
+  color: #333;
 }
 </style>
 

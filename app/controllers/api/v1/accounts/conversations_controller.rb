@@ -101,6 +101,11 @@ class Api::V1::Accounts::ConversationsController < Api::V1::Accounts::BaseContro
     update_last_seen_on_conversation(DateTime.now.utc, assignee?)
   end
 
+  def update_last_seen_2
+    @conversation.update_column(:contact_last_seen_at, DateTime.now.utc)
+    ::Conversations::UpdateMessageStatusJob.perform_later(@conversation.id, @conversation.contact_last_seen_at)
+  end
+
   def unread
     last_incoming_message = @conversation.messages.incoming.last
     last_seen_at = last_incoming_message.created_at - 1.second if last_incoming_message.present?

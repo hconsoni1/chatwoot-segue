@@ -7,11 +7,11 @@ class ConversationFinder
     'last_activity_at_desc' => %w[sort_on_last_activity_at desc],
     'created_at_asc' => %w[sort_on_created_at asc],
     'created_at_desc' => %w[sort_on_created_at desc],
-    'priority_asc' => %w[sort_on_priority asc],
-    'priority_desc' => %w[sort_on_priority desc],
+    'priority_asc' => [%w[sort_on_last_activity_at desc], %w[sort_on_priority desc]],
+    'priority_desc' => [%w[sort_on_last_activity_at desc], %w[sort_on_priority desc]],
     'waiting_since_asc' => %w[sort_on_waiting_since asc],
     'waiting_since_desc' => %w[sort_on_waiting_since desc],
-
+  
     # To be removed in v3.5.0
     'latest' => %w[sort_on_last_activity_at desc],
     'sort_on_created_at' => %w[sort_on_created_at asc],
@@ -167,10 +167,20 @@ class ConversationFinder
     @conversations = @conversations.includes(
       :taggings, :inbox, { assignee: { avatar_attachment: [:blob] } }, { contact: { avatar_attachment: [:blob] } }, :team, :contact_inbox
     )
-
-    sort_by, sort_order = SORT_OPTIONS[params[:sort_by]] || SORT_OPTIONS['last_activity_at_desc']
-    @conversations = @conversations.send(sort_by, sort_order)
-
+  
+    sort_options = SORT_OPTIONS[params[:sort_by]] || SORT_OPTIONS['last_activity_at_desc']
+  
+    if sort_options.is_a?(Array) && sort_options.first.is_a?(Array)
+      # Aplica ordenações compostas
+      sort_options.each do |sort_by, sort_order|
+        @conversations = @conversations.send(sort_by, sort_order)
+      end
+    else
+      # Aplica uma única ordenação
+      sort_by, sort_order = sort_options
+      @conversations = @conversations.send(sort_by, sort_order)
+    end
+  
     if params[:updated_within].present?
       @conversations.where('conversations.updated_at > ?', Time.zone.now - params[:updated_within].to_i.seconds)
     else

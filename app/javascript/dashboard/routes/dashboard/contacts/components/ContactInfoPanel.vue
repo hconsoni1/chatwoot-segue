@@ -56,7 +56,7 @@
               <contact-label :contact-id="contact.id" class="contact-labels" />
             </accordion-item>
           </div>
-          <div v-if="element.name === 'previous_conversation'">
+          <div v-if="element.name === 'previous_conversation' && isAdmin">
             <accordion-item
               :title="
                 $t('CONTACT_PANEL.SIDEBAR_SECTIONS.PREVIOUS_CONVERSATIONS')
@@ -80,6 +80,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import AccordionItem from 'dashboard/components/Accordion/AccordionItem.vue';
 import ContactConversations from 'dashboard/routes/dashboard/conversation/ContactConversations.vue';
 import ContactInfo from 'dashboard/routes/dashboard/conversation/contact/ContactInfo.vue';
@@ -126,9 +127,15 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({
+      currentUser: 'getCurrentUser'
+    }),
     hasContactAttributes() {
       const { custom_attributes: customAttributes } = this.contact;
       return customAttributes && Object.keys(customAttributes).length;
+    },
+    isAdmin() {
+      return this.currentUser.role === 'administrator';
     },
   },
   mounted() {

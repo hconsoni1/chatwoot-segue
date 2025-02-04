@@ -20,13 +20,13 @@
     </div>
     <div class="flex flex-col items-center justify-end pb-6">
       <primary-nav-item
-        v-if="!isACustomBrandedInstance"
+        v-if="!isACustomBrandedInstance && isAdmin"
         icon="book-open-globe"
         name="DOCS"
         :open-in-new-page="true"
         :to="helpDocsURL"
       />
-      <notification-bell @open-notification-panel="openNotificationPanel" />
+      <notification-bell v-if="isAdmin" @open-notification-panel="openNotificationPanel" />
       <agent-details @toggle-menu="toggleOptions" />
       <options-menu
         :show="showOptionsMenu"
@@ -39,6 +39,7 @@
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex';
 import Logo from './Logo.vue';
 import PrimaryNavItem from './PrimaryNavItem.vue';
 import OptionsMenu from './OptionsMenu.vue';
@@ -55,6 +56,15 @@ export default {
     OptionsMenu,
     AgentDetails,
     NotificationBell,
+  },
+  computed: {
+    ...mapGetters({
+      currentUser: 'getCurrentUser',
+    }),
+    isAdmin() {
+      
+      return this.currentUser.role === 'administrator';
+    },
   },
   props: {
     isACustomBrandedInstance: {

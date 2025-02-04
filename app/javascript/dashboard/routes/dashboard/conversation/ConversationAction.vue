@@ -6,17 +6,7 @@
         compact
         :title="$t('CONVERSATION_SIDEBAR.ASSIGNEE_LABEL')"
       >
-        <template v-slot:button>
-          <woot-button
-            v-if="showSelfAssign"
-            icon="arrow-right"
-            variant="link"
-            size="small"
-            @click="onSelfAssign"
-          >
-            {{ $t('CONVERSATION_SIDEBAR.SELF_ASSIGN') }}
-          </woot-button>
-        </template>
+
       </contact-details-item>
       <multiselect-dropdown
         :options="agentsList"
@@ -76,7 +66,7 @@
       compact
       :title="$t('CONVERSATION_SIDEBAR.ACCORDION.CONVERSATION_LABELS')"
     />
-    <conversation-labels :conversation-id="conversationId" />
+    <conversation-labels :conversation-id="conversationId" :current-user="currentUser" />
   </div>
 </template>
 
@@ -90,6 +80,7 @@ import agentMixin from 'dashboard/mixins/agentMixin';
 import teamMixin from 'dashboard/mixins/conversation/teamMixin';
 import { CONVERSATION_PRIORITY } from '../../../../shared/constants/messages';
 import { CONVERSATION_EVENTS } from '../../../helper/AnalyticsHelper/events';
+import adminMixin from 'dashboard/mixins/isAdmin';
 
 export default {
   components: {
@@ -97,7 +88,7 @@ export default {
     MultiselectDropdown,
     ConversationLabels,
   },
-  mixins: [agentMixin, alertMixin, teamMixin],
+  mixins: [agentMixin, alertMixin, teamMixin, adminMixin],
   props: {
     conversationId: {
       type: [Number, String],
@@ -144,6 +135,9 @@ export default {
       currentChat: 'getSelectedChat',
       currentUser: 'getCurrentUser',
     }),
+    isAdmin() {
+      return this.currentUser.role === 'administrator';
+    },
     assignedAgent: {
       get() {
         return this.currentChat.meta.assignee;
@@ -245,6 +239,22 @@ export default {
       this.assignedAgent = selfAssign;
     },
     onClickAssignAgent(selectedItem) {
+      // Verifica as labels do chat
+      const labels = this.currentChat.labels; // Converte string para array
+
+      // Verifica se o chat possui apenas a label 'bot'
+      // if ((labels.length === 1 && labels.includes('bot')) && ![1, 10].includes(this.currentUser.id)) {
+      //   this.showAlert('Ação não permitida. Chat marcado apenas como bot.');
+      //   return; // Retorna nulo e interrompe a execução
+      // }
+
+
+      // Prevent non-admin users from assigning tasks to themselves
+      if (!this.isAdmin && selectedItem.id === this.currentUser.id) {
+        this.showAlert('Ação não permitida. Contate um coordenador')
+        return;
+      }
+
       if (this.assignedAgent && this.assignedAgent.id === selectedItem.id) {
         this.assignedAgent = null;
       } else {

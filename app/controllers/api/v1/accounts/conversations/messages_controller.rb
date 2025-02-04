@@ -45,6 +45,12 @@ class Api::V1::Accounts::Conversations::MessagesController < Api::V1::Accounts::
     render json: { content: translated_content }
   end
 
+  def update_status
+    message.update!(status: params[:status])
+
+    render json: { sucsess: true }
+  end
+
   private
 
   def message

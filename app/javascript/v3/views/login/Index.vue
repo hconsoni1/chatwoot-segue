@@ -4,22 +4,14 @@
   >
     <section class="max-w-5xl mx-auto">
       <img
-        :src="globalConfig.logo"
+        src="https://negocios.seguefinanceira.com.br/2b2acdb1-5132-454d-9809-da92ff8a18a8.png"
         :alt="globalConfig.installationName"
-        class="mx-auto h-8 w-auto block dark:hidden"
-      />
-      <img
-        v-if="globalConfig.logoDark"
-        :src="globalConfig.logoDark"
-        :alt="globalConfig.installationName"
-        class="mx-auto h-8 w-auto hidden dark:block"
+        class="mx-auto h-40	w-auto block"
       />
       <h2
         class="mt-6 text-center text-3xl font-medium text-slate-900 dark:text-woot-50"
       >
-        {{
-          useInstallationName($t('LOGIN.TITLE'), globalConfig.installationName)
-        }}
+        SegueNet
       </h2>
       <p
         v-if="showSignupLink"
@@ -40,7 +32,7 @@
     >
       <div v-if="!email">
         <GoogleOAuthButton v-if="showGoogleOAuth" />
-        <form class="space-y-5" @submit.prevent="submitLogin">
+        <form class="space-y-5 shadow" @submit.prevent="submitLogin">
           <form-input
             v-model.trim="credentials.email"
             name="email_address"
@@ -48,8 +40,8 @@
             data-testid="email_input"
             :tabindex="1"
             required
-            :label="$t('LOGIN.EMAIL.LABEL')"
-            :placeholder="$t('LOGIN.EMAIL.PLACEHOLDER')"
+            label="E-mail"
+            placeholder="Digite seu e-mail"
             :has-error="$v.credentials.email.$error"
             @input="$v.credentials.email.$touch"
           />
@@ -60,18 +52,18 @@
             data-testid="password_input"
             required
             :tabindex="2"
-            :label="$t('LOGIN.PASSWORD.LABEL')"
-            :placeholder="$t('LOGIN.PASSWORD.PLACEHOLDER')"
+            label="Senha"
+            placeholder="Digite sua senha"
             :has-error="$v.credentials.password.$error"
             @input="$v.credentials.password.$touch"
           >
-            <p v-if="!globalConfig.disableUserProfileUpdate">
+            <p v-if="!globalConfig.disableUserProfileUpdate && 1 == 2">
               <router-link
                 to="auth/reset/password"
                 class="text-link text-sm"
                 tabindex="4"
               >
-                {{ $t('LOGIN.FORGOT_PASSWORD') }}
+                Esqueceu sua senha ?
               </router-link>
             </p>
           </form-input>

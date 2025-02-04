@@ -97,6 +97,7 @@
       </div>
       <div class="flex items-center w-full mt-0.5 gap-2">
         <woot-button
+          v-if="!hasConversations"
           v-tooltip="$t('CONTACT_PANEL.NEW_MESSAGE')"
           title="$t('CONTACT_PANEL.NEW_MESSAGE')"
           icon="chat"
@@ -231,6 +232,16 @@ export default {
     contactProfileLink() {
       return `/app/accounts/${this.$route.params.accountId}/contacts/${this.contact.id}`;
     },
+    hasConversations() {
+      const conversations = this.$store.getters['contactConversations/getContactConversation'](this.contact.id);
+
+      if (!conversations || !Array.isArray(conversations)) {
+        return false;
+      }
+
+      const filteredConversations = conversations.filter(conversation => conversation.inbox_id === 22);
+      return filteredConversations.length > 0;
+    },
     additionalAttributes() {
       return this.contact.additional_attributes || {};
     },
@@ -324,6 +335,9 @@ export default {
     openMergeModal() {
       this.toggleMergeModal();
     },
+  },
+  mounted() {
+    this.$store.dispatch('contactConversations/get', this.contact.id);
   },
 };
 </script>

@@ -18,7 +18,7 @@
     </span>
     <a v-else :href="href" :style="anchorStyle">{{ title }}</a>
     <button
-      v-if="showClose"
+      v-if="showClose && 1 == 2"
       class="label-close--button p-0"
       :style="{ color: textColor }"
       @click="onClick"

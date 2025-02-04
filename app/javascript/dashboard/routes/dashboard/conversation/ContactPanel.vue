@@ -95,7 +95,7 @@
               />
             </accordion-item>
           </div>
-          <div v-else-if="element.name === 'previous_conversation'">
+          <div v-else-if="element.name === 'previous_conversation' && isAdmin">
             <accordion-item
               v-if="contact.id"
               :title="
@@ -211,6 +211,9 @@ export default {
     hasContactAttributes() {
       const { custom_attributes: customAttributes } = this.contact;
       return customAttributes && Object.keys(customAttributes).length;
+    },
+    isAdmin() {
+      return this.currentUser.role === 'administrator';
     },
   },
   watch: {

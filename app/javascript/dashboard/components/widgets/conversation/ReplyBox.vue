@@ -155,6 +155,7 @@
 import { mapGetters } from 'vuex';
 import { mixin as clickaway } from 'vue-clickaway';
 import alertMixin from 'shared/mixins/alertMixin';
+import adminMixin from 'dashboard/mixins/isAdmin';
 
 import CannedResponse from './CannedResponse.vue';
 import ReplyToMessage from './ReplyToMessage.vue';
@@ -225,6 +226,7 @@ export default {
     messageFormatterMixin,
     rtlMixin,
     fileUploadMixin,
+    adminMixin,
   ],
   props: {
     popoutReplyBox: {
@@ -316,6 +318,8 @@ export default {
       },
     },
     showSelfAssignBanner() {
+      return false;
+
       if (this.message !== '' && !this.isOnPrivateNote) {
         if (!this.assignedAgent) {
           return true;
@@ -355,14 +359,29 @@ export default {
       return this.maxLength - this.message.length;
     },
     isReplyButtonDisabled() {
+      // Se for uma caixa de entrada do Twitter, desabilitar o botão
       if (this.isATwitterInbox) return true;
-      if (this.hasAttachments || this.hasRecordedAudio) return false;
 
-      return (
-        this.isMessageEmpty ||
-        this.message.length === 0 ||
-        this.message.length > this.maxLength
-      );
+      // Se a mensagem estiver vazia ou ultrapassar o tamanho máximo, e NÃO houver anexos ou gravações de áudio,
+      // desabilitar o botão para todos, incluindo o administrador
+      if (
+        (this.isMessageEmpty ||
+          this.message.length === 0 ||
+          this.message.length > this.maxLength) &&
+        !this.hasAttachments &&
+        !this.hasRecordedAudio
+      ) {
+        return true;
+      }
+
+      // Se o usuário for o administrador, permitir enviar a mensagem
+      if (this.isAdmin) return false;
+
+      // Se o agente atual não for o atribuído, desabilitar o botão
+      if (this.currentChat.meta.assignee.id !== this.currentUser.id) return true;
+
+      // Caso contrário, habilitar o botão
+      return false;
     },
     sender() {
       return {

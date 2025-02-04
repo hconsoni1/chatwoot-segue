@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { vOnClickOutside } from '@vueuse/components';
 import { generateLabelForContactableInboxesList } from 'dashboard/components-next/NewConversation/helpers/composeConversationHelper.js';
@@ -41,6 +41,20 @@ const { t } = useI18n();
 const targetInboxLabel = computed(() => {
   return generateLabelForContactableInboxesList(props.targetInbox);
 });
+
+
+watch(
+  () => props.contactableInboxesList,
+  (newList) => {
+    if (!props.targetInbox && newList?.length) {
+      const defaultInbox = newList.find(inbox => inbox.id === 22);
+      if (defaultInbox) {
+        emit('updateInbox', defaultInbox);
+      }
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>

@@ -14,6 +14,7 @@ const { t } = useI18n();
 const dialogRef = ref(null);
 const contactsFormRef = ref(null);
 const contact = ref(null);
+const isCreatingContactCustom = ref(false);
 
 const uiFlags = useMapGetter('contacts/getUIFlags');
 const isCreatingContact = computed(() => uiFlags.value.isCreating);
@@ -24,10 +25,12 @@ const createNewContact = contactItem => {
 
 const handleDialogConfirm = async () => {
   if (!contact.value) return;
+  isCreatingContactCustom.value = true;
   emit('create', contact.value);
 };
 
 const onSuccess = () => {
+  isCreatingContactCustom.value = false;
   contactsFormRef.value?.resetForm();
   dialogRef.value.close();
 };
@@ -36,7 +39,11 @@ const closeDialog = () => {
   dialogRef.value.close();
 };
 
-defineExpose({ dialogRef, contactsFormRef, onSuccess });
+const onErrorCustom = () => {
+  isCreatingContactCustom.value = false;
+};
+
+defineExpose({ dialogRef, contactsFormRef, onSuccess, onErrorCustom });
 </script>
 
 <template>
@@ -59,7 +66,7 @@ defineExpose({ dialogRef, contactsFormRef, onSuccess });
             t('CONTACTS_LAYOUT.HEADER.ACTIONS.CONTACT_CREATION.SAVE_CONTACT')
           "
           color="blue"
-          :is-loading="isCreatingContact"
+          :is-loading="isCreatingContact || isCreatingContactCustom"
           @click="handleDialogConfirm"
         />
       </div>

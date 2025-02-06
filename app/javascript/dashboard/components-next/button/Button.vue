@@ -193,6 +193,7 @@ const linkButtonClasses = computed(() => {
 <template>
   <button
     v-bind="filteredAttrs"
+    :disabled="isLoading"
     :class="{
       [STYLE_CONFIG.base]: true,
       [isLink ? linkButtonClasses : buttonClasses]: true,

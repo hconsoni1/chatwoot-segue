@@ -59,6 +59,8 @@ const showFiltersModal = ref(false);
 const appliedFilter = ref([]);
 const segmentsQuery = ref({});
 
+const isCreatingContact = computed(() => store.getters['contacts/isCreating']);
+
 const appliedFilters = useMapGetter('contacts/getAppliedContactFiltersV4');
 const contactAttributes = useMapGetter('attributes/getContactAttributes');
 const hasActiveSegments = computed(
@@ -93,6 +95,7 @@ const onCreate = async contact => {
     const data = await response.json();
 
     if (data.exists) {
+      createNewContactDialogRef.value?.onErrorCustom();
       useAlert('Contato já existe. Verifique o novo digito do número de telefone.');
     } else {
       const newContact = await store.dispatch('contacts/create', contact);
@@ -108,6 +111,7 @@ const onCreate = async contact => {
     }
 
   } catch (error) {
+    createNewContactDialogRef.value?.onErrorCustom();
     const i18nPrefix = 'CONTACTS_LAYOUT.HEADER.ACTIONS.CONTACT_CREATION';
     if (error instanceof DuplicateContactException) {
       if (error.data.includes('email')) {

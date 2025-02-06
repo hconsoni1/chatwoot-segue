@@ -111,6 +111,7 @@ export default {
       currentChat: 'getSelectedChat',
       listLoadingStatus: 'getAllMessagesLoaded',
       currentAccountId: 'getCurrentAccountId',
+      currentUser: 'getCurrentUser',
     }),
     isOpen() {
       return this.currentChat?.status === wootConstants.STATUS_TYPE.OPEN;

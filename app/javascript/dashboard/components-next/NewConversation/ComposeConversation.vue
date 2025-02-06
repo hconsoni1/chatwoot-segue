@@ -7,6 +7,7 @@ import { useAlert } from 'dashboard/composables';
 import { ExceptionWithMessage } from 'shared/helpers/CustomErrors';
 import { debounce } from '@chatwoot/utils';
 import { useKeyboardEvents } from 'dashboard/composables/useKeyboardEvents';
+import { useRouter } from 'vue-router';
 import {
   searchContacts,
   createNewContact,
@@ -29,6 +30,7 @@ const props = defineProps({
 
 const store = useStore();
 const { t } = useI18n();
+const router = useRouter();
 
 const contacts = ref([]);
 const selectedContact = ref(null);
@@ -134,6 +136,11 @@ const createConversation = async ({ payload, isFromWhatsApp }) => {
     };
     closeCompose();
     useAlert(t('COMPOSE_NEW_CONVERSATION.FORM.SUCCESS_MESSAGE'), action);
+
+    router.push({
+      name: 'inbox_conversation',
+      params: { conversation_id: data.id },
+    });
     return true; // Return success
   } catch (error) {
     useAlert(
